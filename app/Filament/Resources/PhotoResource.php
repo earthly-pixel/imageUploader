@@ -39,7 +39,7 @@ class PhotoResource extends Resource
             ->headerActions([
                 Tables\Actions\Action::make('zip_data')
                     ->action(function() {
-                        $this->zipData();
+                        static::zipData();
                     })
             ])
             ->columns([
@@ -76,7 +76,7 @@ class PhotoResource extends Resource
         ];
     }
 
-    public function zipData()
+    public static function zipData()
     {
         // The path to the folder that you want to zip
         $folder = storage_path('/app/public/uploads/');
