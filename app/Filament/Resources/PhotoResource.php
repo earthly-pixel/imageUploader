@@ -83,9 +83,10 @@ class PhotoResource extends Resource
                             Notification::make()
                                 ->success()
                                 ->title('Zip Success')
+                                ->body('Zip can be downloaded now.')
                                 ->actions([
                                     Action::make('download')
-                                        ->url(Storage::url($zipFile)),
+                                        ->url(Storage::url('fullImage.zip')),
                                 ])
                                 ->sendToDatabase(Auth::user());
                         } else {
