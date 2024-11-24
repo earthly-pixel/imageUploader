@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PhotoCollection;
 use App\Models\Photo;
+use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -14,22 +15,37 @@ class ApiController extends BaseController
 {
     public function upload(Request $request)
     {
-        if($request->hasFile('image')) {
+        if($request->hasFile('file')) {
 
             $uuid = Str::uuid();
 
             //get filename with extension
-            $filenamewithextension = $request->file('image')->getClientOriginalName();
+            $filenamewithextension = $request->file('file')->getClientOriginalName();
         
             //get filename without extension
             $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
         
             //get file extension
-            $extension = $request->file('image')->getClientOriginalExtension();
+            $extension = $request->file('file')->getClientOriginalExtension();
 
-            $filePath = $request->file('image')->storeAs('/uploads', $uuid.'.'.$extension, 'public');
+            if($extension == 'mp4')
+            {
+                $filePath = $request->file('file')->storeAs('/videos', $uuid.'.'.$extension, 'public');
 
-            $image = Image::read($request->file('image'));
+                Video::create([
+                    'uuid' => $uuid,
+                    'name' => $filename,
+                    'file' => '/videos/'.$uuid.'.'.$extension,
+                ]);
+
+                return $this->sendSuccess([
+                    'file' => url('/storage/videos/'.$uuid.'.'.$extension),
+                ], 'Upload Success', 201);
+            }
+
+            $filePath = $request->file('file')->storeAs('/uploads', $uuid.'.'.$extension, 'public');
+
+            $image = Image::read($request->file('file'));
 
             $image->scaleDown(width: 200);
 
@@ -50,12 +66,21 @@ class ApiController extends BaseController
             ], 'Upload Success', 201);
         }
 
-        return $this->sendError([], 'Image Not Valid');
+        return $this->sendError([], 'File Not Valid');
     }
 
-    public function getAll()
+    public function getAllPhoto()
     {
         $photo = Photo::select('id', 'file', 'thumb')->get();
+
+        $data = PhotoCollection::collection($photo);
+
+        return $this->sendSuccess($data, 'Success Get All Image');
+    }
+
+    public function getAllVideo()
+    {
+        $photo = Video::select('id', 'file')->get();
 
         $data = PhotoCollection::collection($photo);
 
