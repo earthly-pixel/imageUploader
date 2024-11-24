@@ -39,7 +39,50 @@ class PhotoResource extends Resource
             ->headerActions([
                 Tables\Actions\Action::make('zip_data')
                     ->action(function() {
-                        static::zipData();
+                        // The path to the folder that you want to zip
+                        $folder = storage_path('/app/public/uploads/');
+
+                        // The name of the zip file that will be created
+                        $zipFile = 'fullImage.zip';
+
+                        // Initialize the archive object
+                        $zip = new \ZipArchive();
+
+                        ini_set('memory_limit', '2048M');
+                        ini_set('max_execution_time', '6000');
+
+                        // Create the archive
+                        if ($zip->open($zipFile, \ZipArchive::CREATE) === TRUE) {
+                            // Add all the files in the folder
+                            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($folder));
+                            foreach ($files as $name => $file) {
+                                if (!$file->isDir()) {
+                                    $zip->addFile(realpath($file), $file->getFilename());
+                                }
+                            }
+
+                            // Close the archive
+                            $zip->close();
+
+                            // Send the archive to the browser for download
+                            header('Content-Type: application/zip');
+                            header('Content-Length: ' . filesize($zipFile));
+                            header('Content-Disposition: attachment; filename="' . basename($zipFile) . '"');
+                            readfile($zipFile);
+
+                            // Delete the archive file
+                            unlink($zipFile);
+
+                            Notification::make()
+                                ->success()
+                                ->title('Dwonload in Progress')
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->warning()
+                                ->title('Zip Failed')
+                                ->send();
+                        }
                     })
             ])
             ->columns([
