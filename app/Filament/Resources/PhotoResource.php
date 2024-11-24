@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class PhotoResource extends Resource
@@ -43,7 +44,14 @@ class PhotoResource extends Resource
                         $folder = storage_path('/app/public/uploads/');
 
                         // The name of the zip file that will be created
-                        $zipFile = 'fullImage.zip';
+                        $zipFile = storage_path('/app/public/').'fullImage.zip';
+
+                        // Check if file exist
+                        if(File::exists($zipFile))
+                        {
+                            // Delete the archive file
+                            unlink($zipFile);
+                        }
 
                         // Initialize the archive object
                         $zip = new \ZipArchive();
@@ -69,9 +77,6 @@ class PhotoResource extends Resource
                             header('Content-Length: ' . filesize($zipFile));
                             header('Content-Disposition: attachment; filename="' . basename($zipFile) . '"');
                             readfile($zipFile);
-
-                            // Delete the archive file
-                            unlink($zipFile);
 
                             Notification::make()
                                 ->success()
