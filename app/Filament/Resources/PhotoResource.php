@@ -84,7 +84,7 @@ class PhotoResource extends Resource
                                 ->success()
                                 ->title('Zip Success')
                                 ->actions([
-                                    Action::make()
+                                    Action::make('download')
                                         ->url(Storage::url($zipFile)),
                                 ])
                                 ->sendToDatabase(Auth::user());
