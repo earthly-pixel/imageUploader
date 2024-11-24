@@ -37,7 +37,7 @@ class PhotoResource extends Resource
     {
         return $table
             ->headerActions([
-                Tables\Actions\Action::make()
+                Tables\Actions\Action::make('zip_data')
                     ->action(function() {
                         $this->zipData();
                     })
