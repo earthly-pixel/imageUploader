@@ -8,11 +8,13 @@ use App\Jobs\ZipData;
 use App\Models\Video;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
@@ -41,7 +43,8 @@ class VideoResource extends Resource
                 Tables\Actions\Action::make('zip_data')
                     ->action(function() {
                         dispatch(new ZipData('/app/public/videos/', 'fullVideo'));
-                    }),
+                    })
+                    ->after(fn() => Notification::make('notif_v')->info()->title('Please Wait')->body('Zip your data.')->send(Auth::user())),
                 Tables\Actions\Action::make('clear')
                     ->action(function() {
                         Video::truncate();
