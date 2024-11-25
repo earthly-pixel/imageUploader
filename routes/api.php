@@ -9,4 +9,5 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('/upload', [ApiController::class, 'upload']);
-Route::get('/image/all', [ApiController::class, 'getAll']);
+Route::get('/image/all', [ApiController::class, 'getAllPhoto']);
+Route::get('/video/all', [ApiController::class, 'getAllVideo']);

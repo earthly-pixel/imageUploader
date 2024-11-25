@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PhotoCollection extends JsonResource
+class VideoCollection extends JsonResource
 {
     /**
      * Transform the resource collection into an array.
@@ -16,9 +16,8 @@ class PhotoCollection extends JsonResource
     {
         return [
             'id'    => $this->id,
-            'type'  => 'image',
+            'type'  => 'video',
             'file'  => url('storage/'.$this->file),
-            'thumb' => $this->thumb ? url('storage/'.$this->thumb) : '',
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PhotoCollection;
+use App\Http\Resources\VideoCollection;
 use App\Models\Photo;
 use App\Models\Video;
 use Illuminate\Http\Request;
@@ -80,10 +81,10 @@ class ApiController extends BaseController
 
     public function getAllVideo()
     {
-        $photo = Video::select('id', 'file')->get();
+        $video = Video::select('id', 'file')->get();
 
-        $data = PhotoCollection::collection($photo);
+        $data = VideoCollection::collection($video);
 
-        return $this->sendSuccess($data, 'Success Get All Image');
+        return $this->sendSuccess($data, 'Success Get All Video');
     }
 }
