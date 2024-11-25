@@ -43,7 +43,7 @@ class PhotoResource extends Resource
             ->headerActions([
                 Tables\Actions\Action::make('zip_data')
                     ->action(function() {
-                        dispatch(new ZipData('/app/public/uploads/', 'fullImage'));
+                        dispatch(new ZipData('/app/public/uploads/', 'fullImage', Auth::user()));
                     })
                     ->after(fn() => Notification::make('notif_p')->info()->title('Please Wait')->body('Zip your data.')->send(Auth::user())),
                 Tables\Actions\Action::make('clear')

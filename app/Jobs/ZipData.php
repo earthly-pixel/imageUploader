@@ -2,11 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Models\User;
 use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,14 +18,18 @@ class ZipData implements ShouldQueue
 
     public $filename;
 
+    public User $user;
+
     /**
      * Create a new job instance.
      */
-    public function __construct($path, $filename)
+    public function __construct($path, $filename, User $user)
     {
         $this->path = $path;
 
         $this->filename = $filename;
+
+        $this->user = $user;
     }
 
     /**
@@ -73,13 +77,13 @@ class ZipData implements ShouldQueue
                     Action::make('download')
                         ->url(Storage::url($this->filename.'.zip')),
                 ])
-                ->sendToDatabase(Auth::user());
+                ->sendToDatabase($this->user);
         } else {
             Notification::make()
                 ->warning()
                 ->title('Zip Failed')
                 ->body('Try again later.')
-                ->sendToDatabase(Auth::user());
+                ->sendToDatabase($this->user);
         }
     }
 }

@@ -42,7 +42,7 @@ class VideoResource extends Resource
             ->headerActions([
                 Tables\Actions\Action::make('zip_data')
                     ->action(function() {
-                        dispatch(new ZipData('/app/public/videos/', 'fullVideo'));
+                        dispatch(new ZipData('/app/public/videos/', 'fullVideo', Auth::user()));
                     })
                     ->after(fn() => Notification::make('notif_v')->info()->title('Please Wait')->body('Zip your data.')->send(Auth::user())),
                 Tables\Actions\Action::make('clear')
