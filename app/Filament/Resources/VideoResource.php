@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VideoResource\Pages;
 use App\Filament\Resources\VideoResource\RelationManagers;
+use App\Jobs\ZipData;
 use App\Models\Video;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 
@@ -35,6 +37,19 @@ class VideoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                Tables\Actions\Action::make('zip_data')
+                    ->action(function() {
+                        dispatch(new ZipData('/app/public/videos/', 'fullVideo'));
+                    }),
+                Tables\Actions\Action::make('clear')
+                    ->action(function() {
+                        Video::truncate();
+
+                        File::cleanDirectory(storage_path('/app/public/uploads/'));
+                    })
+                
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('file')

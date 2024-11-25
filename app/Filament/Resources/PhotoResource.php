@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PhotoResource\Pages;
 use App\Filament\Resources\PhotoResource\RelationManagers;
+use App\Jobs\ZipData;
 use App\Models\Photo;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -42,59 +43,13 @@ class PhotoResource extends Resource
             ->headerActions([
                 Tables\Actions\Action::make('zip_data')
                     ->action(function() {
-                        // The path to the folder that you want to zip
-                        $folder = storage_path('/app/public/uploads/');
+                        dispatch(new ZipData('/app/public/uploads/', 'fullImage'));
+                    }),
+                Tables\Actions\Action::make('clear')
+                    ->action(function() {
+                        Photo::truncate();
 
-                        // The name of the zip file that will be created
-                        $zipFile = storage_path('/app/public/').'fullImage.zip';
-
-                        // Check if file exist
-                        if(File::exists($zipFile))
-                        {
-                            // Delete the archive file
-                            unlink($zipFile);
-                        }
-
-                        // Initialize the archive object
-                        $zip = new \ZipArchive();
-
-                        ini_set('memory_limit', '2048M');
-                        ini_set('max_execution_time', '6000');
-
-                        // Create the archive
-                        if ($zip->open($zipFile, \ZipArchive::CREATE) === TRUE) {
-                            // Add all the files in the folder
-                            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($folder));
-                            foreach ($files as $name => $file) {
-                                if (!$file->isDir()) {
-                                    $zip->addFile(realpath($file), $file->getFilename());
-                                }
-                            }
-
-                            // Close the archive
-                            $zip->close();
-
-                            // Send the archive to the browser for download
-                            // header('Content-Type: application/zip');
-                            // header('Content-Length: ' . filesize($zipFile));
-                            // header('Content-Disposition: attachment; filename="' . basename($zipFile) . '"');
-                            // readfile($zipFile);
-
-                            Notification::make()
-                                ->success()
-                                ->title('Zip Success')
-                                ->body('Zip can be downloaded now.')
-                                ->actions([
-                                    Action::make('download')
-                                        ->url(Storage::url('fullImage.zip')),
-                                ])
-                                ->sendToDatabase(Auth::user());
-                        } else {
-                            Notification::make()
-                                ->warning()
-                                ->title('Zip Failed')
-                                ->send();
-                        }
+                        File::cleanDirectory(storage_path('/app/public/uploads/'));
                     })
             ])
             ->columns([
