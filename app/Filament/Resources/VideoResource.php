@@ -39,7 +39,7 @@ class VideoResource extends Resource
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('file')
                     ->formatStateUsing(function($state) {
-                        return new HtmlString('<video src="/storage/'.$state.'"></video>');
+                        return new HtmlString('<video style="height: 300px;" src="/storage/'.$state.'"></video>');
                     })
                     ->action(fn($state) => redirect()->to(Storage::url($state))),
             ])
