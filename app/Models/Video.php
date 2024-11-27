@@ -11,5 +11,6 @@ class Video extends Model
         'name', 
         'file', 
         'thumb',
+        'tag',
     ];
 }

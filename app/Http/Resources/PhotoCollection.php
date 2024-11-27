@@ -16,6 +16,7 @@ class PhotoCollection extends JsonResource
     {
         return [
             'id'    => $this->id,
+            'tag'   => $this->tag,
             'type'  => 'image',
             'file'  => url('storage/'.$this->file),
             'thumb' => $this->thumb ? url('storage/'.$this->thumb) : '',

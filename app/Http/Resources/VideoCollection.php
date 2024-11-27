@@ -16,6 +16,7 @@ class VideoCollection extends JsonResource
     {
         return [
             'id'    => $this->id,
+            'tag'   => $this->tag,
             'type'  => 'video',
             'file'  => url('storage/'.$this->file),
         ];

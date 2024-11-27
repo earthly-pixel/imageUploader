@@ -29,41 +29,47 @@ class ApiController extends BaseController
             //get file extension
             $extension = $request->file('file')->getClientOriginalExtension();
 
+            $tag = $request->tag ? $request->tag : 'no_tag';
+
             if($extension == 'mp4')
             {
-                $filePath = $request->file('file')->storeAs('/videos', $uuid.'.'.$extension, 'public');
+                $filePath = $request->file('file')->storeAs('/videos/'.$tag, $uuid.'.'.$extension, 'public');
 
                 Video::create([
                     'uuid' => $uuid,
                     'name' => $filename,
-                    'file' => '/videos/'.$uuid.'.'.$extension,
+                    'tag'  => $request->tag,
+                    'file' => '/videos/'.$tag.'/'.$uuid.'.'.$extension,
                 ]);
 
                 return $this->sendSuccess([
-                    'file' => url('/storage/videos/'.$uuid.'.'.$extension),
+                    'tag'  => $request->tag,
+                    'file' => url('/storage/videos/'.$tag.'/'.$uuid.'.'.$extension),
                 ], 'Upload Success', 201);
             }
 
-            $filePath = $request->file('file')->storeAs('/uploads', $uuid.'.'.$extension, 'public');
+            $filePath = $request->file('file')->storeAs('/uploads/'.$tag, $uuid.'.'.$extension, 'public');
 
             $image = Image::read($request->file('file'));
 
             $image->scaleDown(width: 200);
 
-            File::ensureDirectoryExists(storage_path('app/public/thumbnail/'));
+            File::ensureDirectoryExists(storage_path('app/public/thumbnail/'.$tag.'/'));
 
-            $image->toJpeg()->save(storage_path('app/public/thumbnail/').$uuid.'.jpg');
+            $image->toJpeg()->save(storage_path('app/public/thumbnail/').$tag.'/'.$uuid.'.jpg');
 
             Photo::create([
                 'uuid' => $uuid,
                 'name' => $filename,
-                'file' => '/uploads/'.$uuid.'.'.$extension,
-                'thumb'=> '/thumbnail/'.$uuid.'.jpg',
+                'tag'  => $request->tag,
+                'file' => '/uploads/'.$tag.'/'.$uuid.'.'.$extension,
+                'thumb'=> '/thumbnail/'.$tag.'/'.$uuid.'.jpg',
             ]);
 
             return $this->sendSuccess([
-                'file' => url('/storage/uploads/'.$uuid.'.'.$extension),
-                'thumb'=> url('/storage/thumbnail/'.$uuid.'.'.$extension),
+                'tag'  => $request->tag,
+                'file' => url('/storage/uploads/'.$tag.'/'.$uuid.'.'.$extension),
+                'thumb'=> url('/storage/thumbnail/'.$tag.'/'.$uuid.'.'.$extension),
             ], 'Upload Success', 201);
         }
 
@@ -72,7 +78,7 @@ class ApiController extends BaseController
 
     public function getAllPhoto()
     {
-        $photo = Photo::select('id', 'file', 'thumb')->get();
+        $photo = Photo::select('id', 'file', 'thumb', 'tag')->get();
 
         $data = PhotoCollection::collection($photo);
 
@@ -81,7 +87,7 @@ class ApiController extends BaseController
 
     public function getAllVideo()
     {
-        $video = Video::select('id', 'file')->get();
+        $video = Video::select('id', 'file', 'tag')->get();
 
         $data = VideoCollection::collection($video);
 

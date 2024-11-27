@@ -15,11 +15,14 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
+        $this->call([
+            ShieldSeeder::class,
+        ]);
 
         User::firstOrCreate([
             'name' => 'Admin',
-            'email' => 'admin@mail.com',
-            'password' => Hash::make('admin123'),
-        ]);
+            'email' => 'adminTexno@mail.com',
+            'password' => Hash::make('adminTexno123'),
+        ])->assignRole('super_admin');
     }
 }

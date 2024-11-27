@@ -11,5 +11,6 @@ class Photo extends Model
         'name', 
         'file', 
         'thumb',
+        'tag',
     ];
 }
