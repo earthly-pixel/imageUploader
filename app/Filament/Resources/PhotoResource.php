@@ -86,7 +86,8 @@ class PhotoResource extends Resource
                 // Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('download')
                     ->action(function($record) {
-                        return Storage::download($record->file, $record->name);
+                        // dd(Storage::disk('public')->path($record->file));
+                        return Storage::disk('public')->download($record->file, $record->name);
                     })
                     ->color('primary'),
             ])
